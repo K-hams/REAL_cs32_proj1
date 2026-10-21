@@ -44,7 +44,7 @@ Vector<T>::Vector(std::size_t n) {
         begin_ = nullptr; 
         end_ = nullptr;
         end_cap_ = nullptr;
-        return -1;
+        return;
     }
 
     begin_ = new T[n]; 
@@ -128,7 +128,7 @@ Vector<T>::Vector(const Vector& other) {
         begin_ = nullptr; 
         end_ = nullptr;
         end_cap_ = nullptr;
-        return -1;
+        return;
     }
 
 
