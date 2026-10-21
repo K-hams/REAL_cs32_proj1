@@ -25,7 +25,9 @@
 template <typename T>
 Vector<T>::Vector() {
     // TODO
-    throw std::logic_error("Vector() not implemented");
+    begin_ = nullptr;
+    end_ = nullptr;
+    end_cap_ = nullptr; 
 }
 
 // Creates a vector of n elements, each value-initialized (0 for int, "" for
@@ -38,7 +40,22 @@ Vector<T>::Vector() {
 template <typename T>
 Vector<T>::Vector(std::size_t n) {
     // TODO
-    throw std::logic_error("Vector(n) not implemented");
+    if (n == 0){
+        begin_ = nullptr; 
+        end_ = nullptr;
+        end_cap_ = nullptr;
+        return;
+    }
+
+    begin_ = new T[n]; 
+
+     for (std::size_t i = 0; i < n; i++) {
+        begin_[i] = T();      
+    }
+
+    end_ = begin_ + n;
+    end_cap_ = begin_ + n; 
+    
 }
 
 // Creates a vector of n copies of value. Size and capacity are both n.
@@ -46,7 +63,21 @@ Vector<T>::Vector(std::size_t n) {
 template <typename T>
 Vector<T>::Vector(std::size_t n, const T& value) {
     // TODO
-    throw std::logic_error("Vector(n, value) not implemented");
+     if (n == 0){
+        begin_ = nullptr; 
+        end_ = nullptr;
+        end_cap_ = nullptr;
+        return;
+    }
+    
+    begin_ = new T[n]; 
+
+     for (std::size_t i = 0; i < n; i++) {
+        begin_[i] = value;      
+    }
+
+    end_ = begin_ + n;
+    end_cap_ = begin_ + n; 
 }
 
 // Creates a vector holding the elements of il, in order: Vector<int> v{1, 2, 3}.
@@ -62,7 +93,27 @@ Vector<T>::Vector(std::size_t n, const T& value) {
 template <typename T>
 Vector<T>::Vector(std::initializer_list<T> il) {
     // TODO
-    throw std::logic_error("Vector(initializer_list) not implemented");
+    //if il is empty
+    if (il.size() == 0){
+        begin_ = nullptr;
+        end_ = nullptr;
+        end_cap_ = nullptr; 
+        return;
+    }
+    //il isn't a number its list can't do il[i] can do while loop
+    begin_ = new T[il.size()]; 
+
+    //elem based for loop
+    int num = 0;
+    for (const T& x : il){
+        begin_[num] = x; 
+        num++; 
+    }
+
+    end_ = begin_ + il.size();
+    
+    end_cap_ = begin_ + il.size();
+
 }
 
 // Copy constructor. Makes a deep copy of other. The new capacity is other.size() 
@@ -71,7 +122,26 @@ Vector<T>::Vector(std::initializer_list<T> il) {
 template <typename T>
 Vector<T>::Vector(const Vector& other) {
     // TODO
-    throw std::logic_error("Vector(const Vector&) not implemented");
+
+    //if other is empty
+    if (other.size() == 0){
+        begin_ = nullptr; 
+        end_ = nullptr;
+        end_cap_ = nullptr;
+        return;
+    }
+
+
+    begin_ = new T[other.size()];
+    
+
+    for (int i = 0; i < other.size(); i++){
+        begin_[i] = other.begin_[i];
+    }
+
+    end_ = begin_ + other.size();
+    
+    end_cap_ = begin_ + other.size();
 }
 
 // Copy assignment operator. Replaces this vector's contents with a deep copy
@@ -81,15 +151,43 @@ Vector<T>::Vector(const Vector& other) {
 template <typename T>
 Vector<T>& Vector<T>::operator=(const Vector& other) {
     // TODO
-    throw std::logic_error("operator= not implemented");
+
+    //if already equals
+    if (this == &other) {
+        return *this;
+    }
+
+     //if other is empty
+    if (other.size() == 0){
+        begin_ = nullptr; 
+        end_ = nullptr;
+        end_cap_ = nullptr;
+        return *this;
+    }
+
+    //have to free old mem
+    delete[] begin_; 
+
+    begin_ = new T[other.size()];
+    
+    for (int i = 0; i < other.size(); i++){
+        begin_[i] = other.begin_[i];
+    }
+
+    end_ = begin_ + other.size();
+    end_cap_ = begin_ + other.size();
+
+    return *this; 
+
 }
 
 // Destructor. 
 template <typename T>
 Vector<T>::~Vector() {
     // TODO
-}
+    delete[] begin_; 
 
+}
 // ---- Private helper ----
 
 // Private helper: changes the capacity to exactly new_cap. Afterwards,
@@ -100,7 +198,32 @@ Vector<T>::~Vector() {
 template <typename T>
 void Vector<T>::reallocate(std::size_t new_cap) {
     // TODO
-    throw std::logic_error("reallocate() not implemented");
+    //Precondition:
+    if (new_cap == 0 || new_cap < size()){
+        delete[] begin_;
+        begin_ = nullptr; 
+        end_ = nullptr;
+        end_cap_ = nullptr;
+        return; 
+    }
+    //make new T to hold the vector and copy over the old stuff over and make 
+    //T the size of new_cap? 
+
+    std::size_t old_size = size();
+
+    T* temp = new T[new_cap];
+
+    for (int i = 0; i < size(); i++ ){
+        temp[i] = begin_[i];
+    }
+
+    delete[] begin_;  // freeing 
+
+    begin_ = temp; // new temp cap size
+
+    end_ = begin_ + old_size; // increasing end to point to new end
+
+    end_cap_ = begin_ + new_cap; //cap increasing 
 }
 
 // ---- Element access ----
@@ -110,8 +233,7 @@ void Vector<T>::reallocate(std::size_t new_cap) {
 // (just like std::vector). at() is the version that checks.
 template <typename T>
 T& Vector<T>::operator[](std::size_t i) {
-    // TODO
-    throw std::logic_error("operator[] not implemented");
+    return begin_[i];
 }
 
 // Same as above, for const vectors. operator== needs this: its parameters are
@@ -119,7 +241,8 @@ T& Vector<T>::operator[](std::size_t i) {
 template <typename T>
 const T& Vector<T>::operator[](std::size_t i) const {
     // TODO
-    throw std::logic_error("operator[] const not implemented");
+    return begin_[i];
+    
 }
 
 // Returns a reference to element i.
@@ -127,15 +250,22 @@ const T& Vector<T>::operator[](std::size_t i) const {
 template <typename T>
 T& Vector<T>::at(std::size_t i) {
     // TODO
-    throw std::logic_error("at() not implemented");
+    if (i > size()){
+        throw std::out_of_range("out of range");
+    }
+    return begin_[i];
 }
 
 // Returns a reference to the first element.
 // Throws std::out_of_range if the vector is empty.
 template <typename T>
 T& Vector<T>::front() {
-    // TODO
-    throw std::logic_error("front() not implemented");
+    //vector empty
+    if (empty()){
+        throw std::out_of_range("out of range");
+    }
+
+    return begin_[0];
 }
 
 // Returns a reference to the last element.
@@ -143,7 +273,11 @@ T& Vector<T>::front() {
 template <typename T>
 T& Vector<T>::back() {
     // TODO
-    throw std::logic_error("back() not implemented");
+    if (empty()){
+        throw std::out_of_range("out of range");
+    }
+
+    return end_[0];
 }
 
 // Returns a pointer to the first element of the buffer, or nullptr if there
@@ -151,7 +285,7 @@ T& Vector<T>::back() {
 template <typename T>
 T* Vector<T>::data() {
     // TODO
-    throw std::logic_error("data() not implemented");
+    return begin_;
 }
 
 // ---- Iterators ----
@@ -161,7 +295,8 @@ T* Vector<T>::data() {
 template <typename T>
 T* Vector<T>::begin() {
     // TODO
-    throw std::logic_error("begin() not implemented");
+    T* pointFirst = begin_;
+    return pointFirst; 
 }
 
 // Same as above, for const vectors. Together with end() const, this lets a
@@ -169,7 +304,8 @@ T* Vector<T>::begin() {
 template <typename T>
 const T* Vector<T>::begin() const {
     // TODO
-    throw std::logic_error("begin() const not implemented");
+    T* pointFirst = begin_;
+    return pointFirst; 
 }
 
 // Returns a pointer one past the last element (not past the end of the
@@ -177,14 +313,15 @@ const T* Vector<T>::begin() const {
 template <typename T>
 T* Vector<T>::end() {
     // TODO
-    throw std::logic_error("end() not implemented");
+    return end_;
+    
 }
 
 // Same as above, for const vectors.
 template <typename T>
 const T* Vector<T>::end() const {
     // TODO
-    throw std::logic_error("end() const not implemented");
+    return end_;
 }
 
 // ---- Capacity ----
@@ -193,21 +330,30 @@ const T* Vector<T>::end() const {
 template <typename T>
 std::size_t Vector<T>::size() const {
     // TODO
-    throw std::logic_error("size() not implemented");
+    //have to find num of elements begin_ points to start 
+    int size = end_ - begin_;
+    return size; 
+    
 }
 
 // Returns how many elements the buffer can hold before it must grow.
 template <typename T>
 std::size_t Vector<T>::capacity() const {
     // TODO
-    throw std::logic_error("capacity() not implemented");
+    //subtracting end_cap_ and begin to see difference between 
+    int cap = end_cap_ - begin_;
+    return cap; 
 }
 
 // Returns true if the vector has no elements (size() == 0).
 template <typename T>
 bool Vector<T>::empty() const {
     // TODO
-    throw std::logic_error("empty() not implemented");
+    if ((end_ - begin_) == 0){
+        return true; 
+    }
+
+    return begin_ == end_;
 }
 
 // Makes room for n elements up front, so that the vector can later grow to
@@ -216,8 +362,15 @@ bool Vector<T>::empty() const {
 // and capacity never goes down.
 template <typename T>
 void Vector<T>::reserve(std::size_t n) {
-    // TODO
-    throw std::logic_error("reserve() not implemented");
+    // Todo
+    //extend capacity to be size n so end_cap_ goes till size n
+    //already did this in reallocatin func?
+
+    //preCondition: n > cap already
+    if (n > capacity()){
+        reallocate(n); 
+    }
+    
 }
 
 // Shrinks the buffer so capacity() == size(), keeping the elements.
@@ -226,7 +379,24 @@ void Vector<T>::reserve(std::size_t n) {
 template <typename T>
 void Vector<T>::shrink_to_fit() {
     // TODO
-    throw std::logic_error("shrink_to_fit() not implemented");
+    //if cap == size already
+    if (capacity() == size()){
+        return; 
+    }
+
+    //if size = 0
+    if (size() == 0){
+        delete[] begin_;
+        begin_ = nullptr; 
+        end_ = nullptr;
+        end_cap_ = nullptr;
+        return; 
+    }
+
+    //shrinking
+    reallocate(size());
+
+
 }
 
 // ---- Modifiers ----
@@ -238,8 +408,17 @@ void Vector<T>::shrink_to_fit() {
 // which lives in the old buffer you are about to free.
 template <typename T>
 void Vector<T>::push_back(const T& value) {
-    // TODO
-    throw std::logic_error("push_back() not implemented");
+    T holder = value; 
+
+    //this is if the vector is full so we need to expand it
+     if (size() == capacity()) {           // only when full
+        std::size_t grown = static_cast<std::size_t>(capacity() * growth_factor);
+        reallocate(std::max(capacity() + 1, grown));
+    }
+
+    *end_ = holder; 
+     ++end_;      
+
 }
 
 // Removes the last element. Capacity is unchanged and nothing is freed.
@@ -247,15 +426,23 @@ void Vector<T>::push_back(const T& value) {
 template <typename T>
 void Vector<T>::pop_back() {
     // TODO
-    throw std::logic_error("pop_back() not implemented");
+    if (empty()){
+        throw std::out_of_range("vector is empty"); 
+    }
+
+    end_ = end_ - 1; 
 }
 
 // Removes all elements: size becomes 0. Capacity is unchanged and nothing is
 // freed.
 template <typename T>
 void Vector<T>::clear() {
-    // TODO
-    throw std::logic_error("clear() not implemented");
+    // TODO 
+
+    //nothing freed so no delete[]
+    end_ = begin_; 
+
+
 }
 
 // Changes the size to n.
@@ -266,7 +453,30 @@ void Vector<T>::clear() {
 template <typename T>
 void Vector<T>::resize(std::size_t n) {
     // TODO
-    throw std::logic_error("resize() not implemented");
+    
+    //just moving
+    if (n < size()) {
+        end_ = begin_ + n;              
+    } 
+    
+    // checkin if n is less than size
+    else if (n > size()) {
+
+        //also less than capacity 
+        if (n > capacity()) {
+            reallocate(n);                   
+        }
+
+        //going thru the vector and flling the empty spots
+        for (std::size_t i = size(); i < n; i++) {
+            begin_[i] = T();                  
+        }
+
+        //moving end pointer
+        end_ = begin_ + n;               
+    }
+
+    
 }
 
 // Inserts a copy of value at position index, so that afterwards v[index] is
@@ -278,7 +488,24 @@ void Vector<T>::resize(std::size_t n) {
 template <typename T>
 void Vector<T>::insert(std::size_t index, const T& value) {
     // TODO
-    throw std::logic_error("insert() not implemented");
+
+    if (index > size()){
+        throw std::out_of_range("out of range"); 
+    }
+    //if buffer is full, grow with same formula as push_back
+    if (size() == capacity()) {           // only when full
+        std::size_t grown = static_cast<std::size_t>(capacity() * growth_factor);
+        reallocate(std::max(capacity() + 1, grown));
+    }
+
+    T copy = value;
+
+    for (std::size_t i = size(); i > index; i--) {
+        begin_[i] = begin_[i - 1];
+    }
+
+    begin_[index] = copy;          
+    ++end_;
 }
 
 // Removes the element at index, shifting the elements after it one position
@@ -287,7 +514,19 @@ void Vector<T>::insert(std::size_t index, const T& value) {
 template <typename T>
 void Vector<T>::erase(std::size_t index) {
     // TODO
-    throw std::logic_error("erase() not implemented");
+    if (index >=size()){
+        throw std::out_of_range("out of range");
+    }
+
+    //moving all the elements left
+    for (std::size_t i = index; i + 1 < size(); i++) {
+        begin_[i] = begin_[i + 1];     
+    }
+
+    //removing without doing delete[]
+    --end_;
+
+
 }
 
 // ---- Non-member operators ----
@@ -297,14 +536,31 @@ void Vector<T>::erase(std::size_t index) {
 template <typename T>
 bool operator==(const Vector<T>& a, const Vector<T>& b) {
     // TODO
-    throw std::logic_error("operator== not implemented");
+    //capacity() does not matter
+
+    //size
+    if (a.size() != b.size()) {
+        return false;
+    }
+
+
+    for (std::size_t i = 0; i < a.size(); i++) {
+        if (!(a[i] == b[i])) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 // Returns true if a and b are not equal (hint: use operator==).
 template <typename T>
 bool operator!=(const Vector<T>& a, const Vector<T>& b) {
     // TODO
-    throw std::logic_error("operator!= not implemented");
+    if (!(a == b)){
+        return true;
+    }
+    return false;
 }
 
 #endif
