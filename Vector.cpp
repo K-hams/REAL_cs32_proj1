@@ -44,7 +44,7 @@ Vector<T>::Vector(std::size_t n) {
         begin_ = nullptr; 
         end_ = nullptr;
         end_cap_ = nullptr;
-        return;
+        return -1;
     }
 
     begin_ = new T[n]; 
@@ -128,7 +128,7 @@ Vector<T>::Vector(const Vector& other) {
         begin_ = nullptr; 
         end_ = nullptr;
         end_cap_ = nullptr;
-        return;
+        return -1;
     }
 
 
@@ -157,6 +157,9 @@ Vector<T>& Vector<T>::operator=(const Vector& other) {
         return *this;
     }
 
+    //have to free old mem
+    delete[] begin_; 
+
      //if other is empty
     if (other.size() == 0){
         begin_ = nullptr; 
@@ -165,12 +168,11 @@ Vector<T>& Vector<T>::operator=(const Vector& other) {
         return *this;
     }
 
-    //have to free old mem
-    delete[] begin_; 
+    
 
     begin_ = new T[other.size()];
     
-    for (int i = 0; i < other.size(); i++){
+    for (std::size_t i = 0; i < other.size(); i++){
         begin_[i] = other.begin_[i];
     }
 
