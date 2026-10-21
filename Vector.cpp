@@ -135,7 +135,7 @@ Vector<T>::Vector(const Vector& other) {
     begin_ = new T[other.size()];
     
 
-    for (int i = 0; i < other.size(); i++){
+    for (std::size_t i = 0; i < other.size(); i++){
         begin_[i] = other.begin_[i];
     }
 
@@ -215,7 +215,7 @@ void Vector<T>::reallocate(std::size_t new_cap) {
 
     T* temp = new T[new_cap];
 
-    for (int i = 0; i < size(); i++ ){
+    for (std::size_t i = 0; i < size(); i++ ){
         temp[i] = begin_[i];
     }
 
@@ -252,7 +252,7 @@ const T& Vector<T>::operator[](std::size_t i) const {
 template <typename T>
 T& Vector<T>::at(std::size_t i) {
     // TODO
-    if (i > size()){
+    if (i >= size()){
         throw std::out_of_range("out of range");
     }
     return begin_[i];
@@ -279,7 +279,7 @@ T& Vector<T>::back() {
         throw std::out_of_range("out of range");
     }
 
-    return end_[0];
+    return end_[-1];
 }
 
 // Returns a pointer to the first element of the buffer, or nullptr if there
@@ -343,7 +343,7 @@ template <typename T>
 std::size_t Vector<T>::capacity() const {
     // TODO
     //subtracting end_cap_ and begin to see difference between 
-    int cap = end_cap_ - begin_;
+    std::size_t cap = end_cap_ - begin_;
     return cap; 
 }
 
@@ -491,6 +491,10 @@ template <typename T>
 void Vector<T>::insert(std::size_t index, const T& value) {
     // TODO
 
+    //have to do this cuz value is a reference 
+    T copy = value;
+
+
     if (index > size()){
         throw std::out_of_range("out of range"); 
     }
@@ -500,7 +504,7 @@ void Vector<T>::insert(std::size_t index, const T& value) {
         reallocate(std::max(capacity() + 1, grown));
     }
 
-    T copy = value;
+   
 
     for (std::size_t i = size(); i > index; i--) {
         begin_[i] = begin_[i - 1];
